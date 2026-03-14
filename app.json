@@ -22,6 +22,9 @@
         "UIBackgroundModes": [
           "processing"
         ],
+        "BGTaskSchedulerPermittedIdentifiers": [
+          "com.gansai.upscale-ai.upscale"
+        ],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
