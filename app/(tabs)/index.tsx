@@ -1,14 +1,97 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '@/components/useColorScheme';
+import { useAppStore } from '@/stores/appStore';
+import { useDailyLimit } from '@/hooks/useDailyLimit';
+import { AdBanner } from '@/components/AdBanner';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function HomeScreen() {
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const { setSelectedVideoUri, history, isPro } = useAppStore();
+  const { remaining, limit } = useDailyLimit();
 
-export default function TabOneScreen() {
+  const pickVideo = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      alert('フォトライブラリへのアクセス許可が必要です');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['videos'],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setSelectedVideoUri(result.assets[0].uri);
+      router.push('/process');
+    }
+  };
+
+  const recentHistory = history.slice(0, 3);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View style={[styles.container, isDark && styles.containerDark]}>
+      {/* Daily limit indicator */}
+      {!isPro && (
+        <View style={[styles.limitBadge, remaining === 0 && styles.limitBadgeEmpty]}>
+          <Ionicons name="flash" size={14} color={remaining === 0 ? '#e74c3c' : '#6C5CE7'} />
+          <Text style={[styles.limitText, remaining === 0 && styles.limitTextEmpty]}>
+            今日あと {remaining}/{limit} 回
+          </Text>
+        </View>
+      )}
+
+      {/* Video picker area */}
+      <TouchableOpacity
+        style={[styles.pickArea, isDark && styles.pickAreaDark]}
+        onPress={pickVideo}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="cloud-upload-outline" size={64} color="#6C5CE7" />
+        <Text style={[styles.pickTitle, isDark && styles.textLight]}>
+          動画を選択
+        </Text>
+        <Text style={[styles.pickSubtitle, isDark && styles.textMuted]}>
+          タップしてフォトライブラリから選択
+        </Text>
+        <Text style={[styles.pickFormats, isDark && styles.textMuted]}>
+          MP4 / MOV / AVI対応
+        </Text>
+      </TouchableOpacity>
+
+      {/* Recent history */}
+      {recentHistory.length > 0 && (
+        <View style={styles.recentSection}>
+          <Text style={[styles.sectionTitle, isDark && styles.textLight]}>
+            最近の処理
+          </Text>
+          <FlatList
+            horizontal
+            data={recentHistory}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={[styles.historyCard, isDark && styles.historyCardDark]}>
+                <Image
+                  source={{ uri: item.thumbnailUri }}
+                  style={styles.historyThumb}
+                />
+                <Text style={[styles.historyLabel, isDark && styles.textMuted]} numberOfLines={1}>
+                  {item.outputResolution} · x{item.scale}
+                </Text>
+              </View>
+            )}
+          />
+        </View>
+      )}
+
+      {/* Ad banner for free users */}
+      {!isPro && <AdBanner />}
     </View>
   );
 }
@@ -16,16 +99,99 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
+    padding: 20,
+  },
+  containerDark: {
+    backgroundColor: '#000',
+  },
+  limitBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: '#f0ecff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginBottom: 16,
+    gap: 4,
+  },
+  limitBadgeEmpty: {
+    backgroundColor: '#fde8e8',
+  },
+  limitText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6C5CE7',
+  },
+  limitTextEmpty: {
+    color: '#e74c3c',
+  },
+  pickArea: {
+    flex: 1,
+    maxHeight: 300,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#e0d8ff',
+    borderStyle: 'dashed',
     justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  pickAreaDark: {
+    backgroundColor: '#111',
+    borderColor: '#333',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  pickTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1a1a2e',
+    marginTop: 8,
+  },
+  pickSubtitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  pickFormats: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+  },
+  textLight: {
+    color: '#fff',
+  },
+  textMuted: {
+    color: '#888',
+  },
+  recentSection: {
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1a1a2e',
+    marginBottom: 12,
+  },
+  historyCard: {
+    width: 100,
+    marginRight: 12,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  historyCardDark: {
+    backgroundColor: '#111',
+  },
+  historyThumb: {
+    width: 100,
+    height: 75,
+    backgroundColor: '#eee',
+  },
+  historyLabel: {
+    fontSize: 11,
+    color: '#666',
+    padding: 6,
+    textAlign: 'center',
   },
 });
