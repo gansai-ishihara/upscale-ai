@@ -18,6 +18,12 @@ export const REVENUECAT = {
   },
 } as const;
 
+// App Store提出前に実際のURLに差し替え
+export const LEGAL_URLS = {
+  PRIVACY: 'https://gansai-ishihara.github.io/upscale-ai/privacy',
+  TERMS: 'https://gansai-ishihara.github.io/upscale-ai/terms',
+} as const;
+
 export const UPSCALE_OPTIONS = {
   scales: [2, 4] as const,
   defaultScale: 2 as const,

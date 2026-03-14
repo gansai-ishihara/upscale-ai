@@ -3,6 +3,8 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
+import mobileAds from 'react-native-google-mobile-ads';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -30,6 +32,15 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  // ATT → AdMob 初期化 (ATTダイアログを先に表示してからAdMobを初期化)
+  useEffect(() => {
+    async function initAds() {
+      await requestTrackingPermissionsAsync();
+      await mobileAds().initialize();
+    }
+    initAds();
+  }, []);
 
   if (!loaded) {
     return null;

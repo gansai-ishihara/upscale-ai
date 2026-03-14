@@ -4,6 +4,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useAppStore } from '@/stores/appStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallModal } from '@/components/PaywallModal';
+import { LEGAL_URLS } from '@/constants/config';
 import { useState } from 'react';
 
 interface SettingsRowProps {
@@ -82,6 +83,14 @@ export default function SettingsScreen() {
           onPress={handleRestore}
           isDark={isDark}
         />
+        {isPro && (
+          <SettingsRow
+            icon="card"
+            label="サブスクリプション管理"
+            onPress={() => Linking.openURL('https://apps.apple.com/account/subscriptions')}
+            isDark={isDark}
+          />
+        )}
       </View>
 
       {/* Legal */}
@@ -90,13 +99,13 @@ export default function SettingsScreen() {
         <SettingsRow
           icon="document-text"
           label="利用規約"
-          onPress={() => Linking.openURL('https://example.com/terms')}
+          onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}
           isDark={isDark}
         />
         <SettingsRow
           icon="shield-checkmark"
           label="プライバシーポリシー"
-          onPress={() => Linking.openURL('https://example.com/privacy')}
+          onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}
           isDark={isDark}
         />
         <SettingsRow

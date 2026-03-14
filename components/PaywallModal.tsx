@@ -1,6 +1,7 @@
-import { StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Modal, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSubscription } from '@/hooks/useSubscription';
+import { LEGAL_URLS } from '@/constants/config';
 
 interface PaywallModalProps {
   visible: boolean;
@@ -58,9 +59,23 @@ export function PaywallModal({ visible, onClose }: PaywallModalProps) {
           </TouchableOpacity>
         </View>
 
+        {/* Apple審査必須: サブスクリプション条件の明示 */}
         <Text style={styles.legal}>
-          いつでもキャンセル可能 · 自動更新サブスクリプション
+          サブスクリプションは自動更新されます。{'\n'}
+          期間終了の24時間前までにキャンセルしない限り自動更新されます。{'\n'}
+          お支払いはApple IDアカウントに請求されます。{'\n'}
+          設定アプリ → Apple ID → サブスクリプションから管理・解約できます。
         </Text>
+
+        <View style={styles.legalLinks}>
+          <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}>
+            <Text style={styles.legalLink}>利用規約</Text>
+          </TouchableOpacity>
+          <Text style={styles.legalSeparator}>|</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}>
+            <Text style={styles.legalLink}>プライバシーポリシー</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -104,5 +119,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   bestValueText: { fontSize: 11, fontWeight: '700', color: '#1a1a2e' },
-  legal: { textAlign: 'center', fontSize: 11, color: '#bbb', marginTop: 20 },
+  legal: { textAlign: 'center', fontSize: 11, color: '#bbb', marginTop: 20, lineHeight: 17 },
+  legalLinks: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+    gap: 8,
+  },
+  legalLink: { fontSize: 12, color: '#6C5CE7', textDecorationLine: 'underline' },
+  legalSeparator: { fontSize: 12, color: '#ccc' },
 });
