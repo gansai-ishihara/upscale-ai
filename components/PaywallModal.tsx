@@ -1,22 +1,22 @@
 import { StyleSheet, View, Text, TouchableOpacity, Modal, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSubscription } from '@/hooks/useSubscription';
-import { LEGAL_URLS } from '@/constants/config';
+import { LEGAL_URLS, IAP } from '@/constants/config';
+import { useTranslation } from '@/constants/i18n';
 
 interface PaywallModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const FEATURES = [
-  { icon: 'infinite' as const, text: '無制限の動画処理' },
-  { icon: 'eye-off' as const, text: '広告を完全非表示' },
-  { icon: 'water' as const, text: '透かしなしの出力' },
-  { icon: 'flash' as const, text: '優先処理キュー' },
-];
-
 export function PaywallModal({ visible, onClose }: PaywallModalProps) {
-  const { purchaseMonthly, purchaseYearly } = useSubscription();
+  const { purchase } = useSubscription();
+  const { t } = useTranslation();
+
+  const FEATURES = [
+    { icon: 'infinite' as const, text: t('paywall.featureUnlimited') },
+    { icon: 'ban' as const, text: t('paywall.featureNoAds') },
+  ];
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
@@ -30,7 +30,7 @@ export function PaywallModal({ visible, onClose }: PaywallModalProps) {
             <Ionicons name="star" size={40} color="#FFD700" />
           </View>
           <Text style={styles.title}>UpScale AI Pro</Text>
-          <Text style={styles.subtitle}>全機能をアンロック</Text>
+          <Text style={styles.subtitle}>{t('paywall.subtitle')}</Text>
         </View>
 
         {/* Features */}
@@ -43,37 +43,19 @@ export function PaywallModal({ visible, onClose }: PaywallModalProps) {
           ))}
         </View>
 
-        {/* Plans */}
-        <View style={styles.plans}>
-          <TouchableOpacity style={styles.planCard} onPress={purchaseYearly}>
-            <View style={styles.bestValueBadge}>
-              <Text style={styles.bestValueText}>約34%お得</Text>
-            </View>
-            <Text style={styles.planPrice}>¥3,800</Text>
-            <Text style={styles.planPeriod}>年額 (¥317/月)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.planCard, styles.planCardSecondary]} onPress={purchaseMonthly}>
-            <Text style={styles.planPrice}>¥480</Text>
-            <Text style={styles.planPeriod}>月額</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Apple審査必須: サブスクリプション条件の明示 */}
-        <Text style={styles.legal}>
-          サブスクリプションは自動更新されます。{'\n'}
-          期間終了の24時間前までにキャンセルしない限り自動更新されます。{'\n'}
-          お支払いはApple IDアカウントに請求されます。{'\n'}
-          設定アプリ → Apple ID → サブスクリプションから管理・解約できます。
-        </Text>
+        {/* Purchase button */}
+        <TouchableOpacity style={styles.purchaseBtn} onPress={purchase}>
+          <Text style={styles.purchasePrice}>{IAP.PRICE}</Text>
+          <Text style={styles.purchaseLabel}>{t('paywall.purchaseLabel')}</Text>
+        </TouchableOpacity>
 
         <View style={styles.legalLinks}>
           <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}>
-            <Text style={styles.legalLink}>利用規約</Text>
+            <Text style={styles.legalLink}>{t('paywall.terms')}</Text>
           </TouchableOpacity>
           <Text style={styles.legalSeparator}>|</Text>
           <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}>
-            <Text style={styles.legalLink}>プライバシーポリシー</Text>
+            <Text style={styles.legalLink}>{t('paywall.privacy')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -98,33 +80,20 @@ const styles = StyleSheet.create({
   features: { marginTop: 32, gap: 16 },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   featureText: { fontSize: 16, color: '#333', fontWeight: '500' },
-  plans: { flexDirection: 'row', gap: 12, marginTop: 32 },
-  planCard: {
-    flex: 1,
+  purchaseBtn: {
     backgroundColor: '#6C5CE7',
     borderRadius: 16,
-    padding: 20,
+    paddingVertical: 20,
     alignItems: 'center',
-    position: 'relative',
+    marginTop: 40,
   },
-  planCardSecondary: { backgroundColor: '#f0ecff' },
-  planPrice: { fontSize: 28, fontWeight: '800', color: '#fff' },
-  planPeriod: { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
-  bestValueBadge: {
-    position: 'absolute',
-    top: -10,
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  bestValueText: { fontSize: 11, fontWeight: '700', color: '#1a1a2e' },
-  legal: { textAlign: 'center', fontSize: 11, color: '#bbb', marginTop: 20, lineHeight: 17 },
+  purchasePrice: { fontSize: 32, fontWeight: '800', color: '#fff' },
+  purchaseLabel: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
   legalLinks: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 20,
     gap: 8,
   },
   legalLink: { fontSize: 12, color: '#6C5CE7', textDecorationLine: 'underline' },

@@ -28,6 +28,10 @@ export interface HistoryItem {
 }
 
 interface AppState {
+  // Tracking
+  trackingAllowed: boolean;
+  setTrackingAllowed: (allowed: boolean) => void;
+
   // Subscription
   isPro: boolean;
   setIsPro: (isPro: boolean) => void;
@@ -70,6 +74,9 @@ const initialOptions: UpscaleOptions = {
 };
 
 export const useAppStore = create<AppState>((set) => ({
+  trackingAllowed: false,
+  setTrackingAllowed: (allowed) => set({ trackingAllowed: allowed }),
+
   isPro: false,
   setIsPro: (isPro) => set({ isPro }),
 

@@ -2,16 +2,11 @@ import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Alert } from
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAppStore, HistoryItem } from '@/stores/appStore';
+import { useTranslation } from '@/constants/i18n';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return m > 0 ? `${m}分${s}秒` : `${s}秒`;
 }
 
 function formatDate(iso: string): string {
@@ -23,11 +18,20 @@ export default function HistoryScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { history, clearHistory } = useAppStore();
+  const { t } = useTranslation();
+
+  const formatDuration = (seconds: number): string => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m > 0
+      ? `${m}${t('history.minuteShort')}${s}${t('history.secondShort')}`
+      : `${s}${t('history.secondShort')}`;
+  };
 
   const handleClear = () => {
-    Alert.alert('履歴を削除', '全ての処理履歴を削除しますか？', [
-      { text: 'キャンセル', style: 'cancel' },
-      { text: '削除', style: 'destructive', onPress: clearHistory },
+    Alert.alert(t('history.clearTitle'), t('history.clearMessage'), [
+      { text: t('history.cancel'), style: 'cancel' },
+      { text: t('history.delete'), style: 'destructive', onPress: clearHistory },
     ]);
   };
 
@@ -55,20 +59,20 @@ export default function HistoryScreen() {
         <View style={styles.empty}>
           <Ionicons name="time-outline" size={64} color={isDark ? '#333' : '#ddd'} />
           <Text style={[styles.emptyText, isDark && styles.textMuted]}>
-            処理履歴がありません
+            {t('history.empty')}
           </Text>
           <Text style={[styles.emptySubtext, isDark && styles.textMuted]}>
-            動画を超解像処理すると{'\n'}ここに履歴が表示されます
+            {t('history.emptySubtext')}
           </Text>
         </View>
       ) : (
         <>
           <View style={styles.header}>
             <Text style={[styles.headerTitle, isDark && styles.textLight]}>
-              {history.length}件の処理
+              {t('history.count', { count: history.length })}
             </Text>
             <TouchableOpacity onPress={handleClear}>
-              <Text style={styles.clearButton}>全て削除</Text>
+              <Text style={styles.clearButton}>{t('history.clearAll')}</Text>
             </TouchableOpacity>
           </View>
           <FlatList

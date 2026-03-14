@@ -8,6 +8,8 @@ import mobileAds from 'react-native-google-mobile-ads';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { useAppStore } from '@/stores/appStore';
+import { useTranslation } from '@/constants/i18n';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -22,6 +24,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
   const colorScheme = useColorScheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (error) throw error;
@@ -34,9 +37,11 @@ export default function RootLayout() {
   }, [loaded]);
 
   // ATT → AdMob 初期化 (ATTダイアログを先に表示してからAdMobを初期化)
+  const { setTrackingAllowed } = useAppStore();
   useEffect(() => {
     async function initAds() {
-      await requestTrackingPermissionsAsync();
+      const { status } = await requestTrackingPermissionsAsync();
+      setTrackingAllowed(status === 'granted');
       await mobileAds().initialize();
     }
     initAds();
@@ -58,14 +63,14 @@ export default function RootLayout() {
         <Stack.Screen
           name="process"
           options={{
-            title: '処理設定',
+            title: t('screen.process'),
             presentation: 'card',
           }}
         />
         <Stack.Screen
           name="result"
           options={{
-            title: '処理結果',
+            title: t('screen.result'),
             presentation: 'card',
           }}
         />

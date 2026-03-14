@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 import { useAppStore, UpscaleOptions } from '@/stores/appStore';
 
 // Native Module bridge - will be available after EAS Build
@@ -62,17 +63,21 @@ export function useUpscaler() {
     setOutputVideoUri(outputPath);
     resetProcessing();
 
+    // Get actual file size
+    const fileInfo = await FileSystem.getInfoAsync(outputPath, { size: true });
+    const fileSize = fileInfo.exists && 'size' in fileInfo ? (fileInfo.size ?? 0) : 0;
+
     // Add to history
     addHistoryItem({
       id: Date.now().toString(),
       inputUri: videoUri,
       outputUri: outputPath,
-      thumbnailUri: outputPath, // TODO: generate thumbnail
+      thumbnailUri: outputPath,
       scale: options.scale,
       inputResolution: '720p',
       outputResolution: options.scale === 2 ? '1080p' : '2160p',
       processingTime,
-      fileSize: 0, // TODO: get actual file size
+      fileSize,
       createdAt: new Date().toISOString(),
     });
 

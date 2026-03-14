@@ -19,17 +19,11 @@
         "NSPhotoLibraryUsageDescription": "動画を選択してAI超解像処理するためにフォトライブラリへのアクセスが必要です",
         "NSPhotoLibraryAddUsageDescription": "処理済み動画をカメラロールに保存するために必要です",
         "NSUserTrackingUsageDescription": "広告の最適化のために使用します。データは第三者と共有されません。",
-        "UIBackgroundModes": ["processing"]
+        "UIBackgroundModes": [
+          "processing"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "package": "com.gansai.upscaleai"
     },
     "plugins": [
       "expo-router",
@@ -39,18 +33,20 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy",
-          "iosAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy"
+          "iosAppId": "ca-app-pub-9059282179467665~2457250987"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "eas": {
-        "projectId": "your-eas-project-id"
-      }
-    }
+        "projectId": "f414da5c-d9da-4c92-8305-3f51b22b9932"
+      },
+      "router": {}
+    },
+    "owner": "talkbuddy"
   }
 }

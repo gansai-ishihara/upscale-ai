@@ -6,22 +6,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAppStore } from '@/stores/appStore';
 import { BeforeAfter } from '@/components/BeforeAfter';
+import { useTranslation } from '@/constants/i18n';
 
 export default function ResultScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const { selectedVideoUri, outputVideoUri, isPro } = useAppStore();
+  const { t } = useTranslation();
 
   const handleSave = async () => {
     if (!outputVideoUri) return;
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('エラー', 'カメラロールへのアクセス許可が必要です');
+      Alert.alert(t('result.saveError'), t('result.savePermission'));
       return;
     }
     await MediaLibrary.saveToLibraryAsync(outputVideoUri);
-    Alert.alert('保存完了', 'カメラロールに保存しました');
+    Alert.alert(t('result.saveSuccess'), t('result.saveSuccessMsg'));
   };
 
   const handleShare = async () => {
@@ -36,10 +38,10 @@ export default function ResultScreen() {
       <View style={[styles.container, isDark && styles.containerDark, styles.center]}>
         <Ionicons name="alert-circle-outline" size={48} color="#999" />
         <Text style={[styles.emptyText, isDark && styles.textMuted]}>
-          処理結果がありません
+          {t('result.noResult')}
         </Text>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backBtnText}>戻る</Text>
+          <Text style={styles.backBtnText}>{t('result.goBack')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -53,17 +55,12 @@ export default function ResultScreen() {
           beforeUri={selectedVideoUri ?? ''}
           afterUri={outputVideoUri}
         />
-        {!isPro && (
-          <View style={styles.watermarkBadge}>
-            <Text style={styles.watermarkText}>UpScale AI</Text>
-          </View>
-        )}
       </View>
 
       {/* Result info */}
       <View style={[styles.infoCard, isDark && styles.cardDark]}>
         <View style={styles.infoRow}>
-          <Text style={[styles.infoLabel, isDark && styles.textMuted]}>処理完了</Text>
+          <Text style={[styles.infoLabel, isDark && styles.textMuted]}>{t('result.complete')}</Text>
           <Ionicons name="checkmark-circle" size={20} color="#27ae60" />
         </View>
       </View>
@@ -72,12 +69,12 @@ export default function ResultScreen() {
       <View style={styles.actions}>
         <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
           <Ionicons name="download-outline" size={22} color="#fff" />
-          <Text style={styles.saveBtnText}>カメラロールに保存</Text>
+          <Text style={styles.saveBtnText}>{t('result.saveToCameraRoll')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.shareBtn, isDark && styles.shareBtnDark]} onPress={handleShare}>
           <Ionicons name="share-outline" size={22} color="#6C5CE7" />
-          <Text style={styles.shareBtnText}>共有</Text>
+          <Text style={styles.shareBtnText}>{t('result.share')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -86,7 +83,7 @@ export default function ResultScreen() {
         style={styles.homeBtn}
         onPress={() => router.replace('/(tabs)')}
       >
-        <Text style={[styles.homeBtnText, isDark && styles.textMuted]}>ホームに戻る</Text>
+        <Text style={[styles.homeBtnText, isDark && styles.textMuted]}>{t('result.goHome')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAppStore } from '@/stores/appStore';
 import { useDailyLimit } from '@/hooks/useDailyLimit';
-import { AdBanner } from '@/components/AdBanner';
+import { useTranslation } from '@/constants/i18n';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -13,11 +13,12 @@ export default function HomeScreen() {
   const isDark = colorScheme === 'dark';
   const { setSelectedVideoUri, history, isPro } = useAppStore();
   const { remaining, limit } = useDailyLimit();
+  const { t } = useTranslation();
 
   const pickVideo = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      alert('フォトライブラリへのアクセス許可が必要です');
+      alert(t('home.permissionRequired'));
       return;
     }
 
@@ -41,7 +42,7 @@ export default function HomeScreen() {
         <View style={[styles.limitBadge, remaining === 0 && styles.limitBadgeEmpty]}>
           <Ionicons name="flash" size={14} color={remaining === 0 ? '#e74c3c' : '#6C5CE7'} />
           <Text style={[styles.limitText, remaining === 0 && styles.limitTextEmpty]}>
-            今日あと {remaining}/{limit} 回
+            {t('home.dailyRemaining', { remaining, limit })}
           </Text>
         </View>
       )}
@@ -54,13 +55,13 @@ export default function HomeScreen() {
       >
         <Ionicons name="cloud-upload-outline" size={64} color="#6C5CE7" />
         <Text style={[styles.pickTitle, isDark && styles.textLight]}>
-          動画を選択
+          {t('home.pickVideo')}
         </Text>
         <Text style={[styles.pickSubtitle, isDark && styles.textMuted]}>
-          タップしてフォトライブラリから選択
+          {t('home.pickSubtitle')}
         </Text>
         <Text style={[styles.pickFormats, isDark && styles.textMuted]}>
-          MP4 / MOV / AVI対応
+          {t('home.pickFormats')}
         </Text>
       </TouchableOpacity>
 
@@ -68,7 +69,7 @@ export default function HomeScreen() {
       {recentHistory.length > 0 && (
         <View style={styles.recentSection}>
           <Text style={[styles.sectionTitle, isDark && styles.textLight]}>
-            最近の処理
+            {t('home.recentHistory')}
           </Text>
           <FlatList
             horizontal
@@ -90,8 +91,6 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {/* Ad banner for free users */}
-      {!isPro && <AdBanner />}
     </View>
   );
 }

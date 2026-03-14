@@ -6,7 +6,8 @@ import { useAppStore } from '@/stores/appStore';
 import { useUpscaler } from '@/hooks/useUpscaler';
 import { useDailyLimit } from '@/hooks/useDailyLimit';
 import { ProgressBar } from '@/components/ProgressBar';
-import { AdBanner } from '@/components/AdBanner';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useTranslation } from '@/constants/i18n';
 
 export default function ProcessScreen() {
   const router = useRouter();
@@ -15,21 +16,24 @@ export default function ProcessScreen() {
   const { selectedVideoUri, options, setOptions, processing, isPro } = useAppStore();
   const { startUpscale, cancelUpscale } = useUpscaler();
   const { remaining, canProcess, incrementCount } = useDailyLimit();
+  const { showIfReady } = useInterstitialAd();
+  const { t } = useTranslation();
 
   const handleStart = async () => {
     if (!selectedVideoUri) return;
 
     if (!isPro && !canProcess) {
-      Alert.alert('制限に達しました', '今日の無料枠を使い切りました。Proプランにアップグレードすると無制限に利用できます。');
+      Alert.alert(t('process.limitReached'), t('process.limitReachedMsg'));
       return;
     }
 
     try {
       await startUpscale(selectedVideoUri, options);
       if (!isPro) await incrementCount();
+      showIfReady();
       router.replace('/result');
     } catch (error) {
-      Alert.alert('エラー', '処理中にエラーが発生しました。もう一度お試しください。');
+      Alert.alert(t('process.error'), t('process.errorMsg'));
     }
   };
 
@@ -44,18 +48,18 @@ export default function ProcessScreen() {
       <View style={[styles.videoPreview, isDark && styles.cardDark]}>
         <Ionicons name="videocam" size={40} color="#6C5CE7" />
         <Text style={[styles.videoLabel, isDark && styles.textLight]}>
-          動画を選択済み
+          {t('process.videoSelected')}
         </Text>
       </View>
 
       {/* Options */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>設定</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>{t('process.settings')}</Text>
 
         {/* Scale selector */}
         <View style={[styles.card, isDark && styles.cardDark]}>
           <Text style={[styles.optionLabel, isDark && styles.textLight]}>
-            アップスケール倍率
+            {t('process.scaleFactor')}
           </Text>
           <View style={styles.scaleButtons}>
             <TouchableOpacity
@@ -87,8 +91,8 @@ export default function ProcessScreen() {
         <View style={[styles.card, isDark && styles.cardDark]}>
           <View style={styles.toggleRow}>
             <View>
-              <Text style={[styles.optionLabel, isDark && styles.textLight]}>ノイズ除去</Text>
-              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>AI生成ノイズを軽減</Text>
+              <Text style={[styles.optionLabel, isDark && styles.textLight]}>{t('process.denoise')}</Text>
+              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>{t('process.denoiseDesc')}</Text>
             </View>
             <Switch
               value={options.denoise}
@@ -101,8 +105,8 @@ export default function ProcessScreen() {
         <View style={[styles.card, isDark && styles.cardDark]}>
           <View style={styles.toggleRow}>
             <View>
-              <Text style={[styles.optionLabel, isDark && styles.textLight]}>シャープネス強化</Text>
-              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>輪郭をくっきり補正</Text>
+              <Text style={[styles.optionLabel, isDark && styles.textLight]}>{t('process.sharpen')}</Text>
+              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>{t('process.sharpenDesc')}</Text>
             </View>
             <Switch
               value={options.sharpen}
@@ -115,8 +119,8 @@ export default function ProcessScreen() {
         <View style={[styles.card, isDark && styles.cardDark]}>
           <View style={styles.toggleRow}>
             <View>
-              <Text style={[styles.optionLabel, isDark && styles.textLight]}>色補正 (SNS最適化)</Text>
-              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>SNS投稿に最適な色味に調整</Text>
+              <Text style={[styles.optionLabel, isDark && styles.textLight]}>{t('process.colorEnhance')}</Text>
+              <Text style={[styles.optionDesc, isDark && styles.textMuted]}>{t('process.colorEnhanceDesc')}</Text>
             </View>
             <Switch
               value={options.colorEnhance}
@@ -136,7 +140,7 @@ export default function ProcessScreen() {
             estimatedTimeRemaining={processing.estimatedTimeRemaining}
           />
           <TouchableOpacity style={styles.cancelBtn} onPress={cancelUpscale}>
-            <Text style={styles.cancelBtnText}>処理を中止</Text>
+            <Text style={styles.cancelBtnText}>{t('process.cancel')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -149,19 +153,16 @@ export default function ProcessScreen() {
           disabled={!canProcess && !isPro}
         >
           <Ionicons name="sparkles" size={22} color="#fff" />
-          <Text style={styles.startBtnText}>処理開始</Text>
+          <Text style={styles.startBtnText}>{t('process.start')}</Text>
         </TouchableOpacity>
       )}
 
       {/* Daily limit warning */}
       {!isPro && (
         <Text style={[styles.limitNote, isDark && styles.textMuted]}>
-          残り {remaining} 回 (Proで無制限)
+          {t('process.limitRemaining', { remaining })}
         </Text>
       )}
-
-      {/* Interstitial ad placeholder */}
-      {!isPro && <AdBanner />}
 
       <View style={{ height: 40 }} />
     </ScrollView>

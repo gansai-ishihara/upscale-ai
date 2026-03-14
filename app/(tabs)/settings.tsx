@@ -6,6 +6,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { PaywallModal } from '@/components/PaywallModal';
 import { LEGAL_URLS } from '@/constants/config';
 import { useState } from 'react';
+import { useTranslation } from '@/constants/i18n';
 
 interface SettingsRowProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -48,13 +49,14 @@ export default function SettingsScreen() {
   const { isPro } = useAppStore();
   const { restore } = useSubscription();
   const [paywallVisible, setPaywallVisible] = useState(false);
+  const { t } = useTranslation();
 
   const handleRestore = async () => {
     try {
       await restore();
-      Alert.alert('復元完了', '購入情報を復元しました');
+      Alert.alert(t('settings.restoreSuccess'), t('settings.restoreSuccessMsg'));
     } catch {
-      Alert.alert('エラー', '購入情報の復元に失敗しました');
+      Alert.alert(t('settings.restoreError'), t('settings.restoreErrorMsg'));
     }
   };
 
@@ -62,59 +64,51 @@ export default function SettingsScreen() {
     <ScrollView style={[styles.container, isDark && styles.containerDark]}>
       {/* Pro section */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>サブスクリプション</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>{t('settings.subscription')}</Text>
         {isPro ? (
           <View style={[styles.proBadge]}>
             <Ionicons name="star" size={20} color="#FFD700" />
-            <Text style={styles.proBadgeText}>Pro プラン利用中</Text>
+            <Text style={styles.proBadgeText}>{t('settings.proActive')}</Text>
           </View>
         ) : (
           <SettingsRow
             icon="rocket"
-            label="Pro にアップグレード"
-            value="¥480/月〜"
+            label={t('settings.upgradePro')}
+            value={t('settings.upgradePrice')}
             onPress={() => setPaywallVisible(true)}
             isDark={isDark}
           />
         )}
         <SettingsRow
           icon="refresh"
-          label="購入を復元"
+          label={t('settings.restore')}
           onPress={handleRestore}
           isDark={isDark}
         />
-        {isPro && (
-          <SettingsRow
-            icon="card"
-            label="サブスクリプション管理"
-            onPress={() => Linking.openURL('https://apps.apple.com/account/subscriptions')}
-            isDark={isDark}
-          />
-        )}
       </View>
 
       {/* Legal */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>法的情報</Text>
+        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>{t('settings.legal')}</Text>
         <SettingsRow
           icon="document-text"
-          label="利用規約"
+          label={t('settings.terms')}
           onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}
           isDark={isDark}
         />
         <SettingsRow
           icon="shield-checkmark"
-          label="プライバシーポリシー"
+          label={t('settings.privacy')}
           onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}
           isDark={isDark}
         />
         <SettingsRow
           icon="code-slash"
-          label="オープンソースライセンス"
+          label={t('settings.licenses')}
           onPress={() =>
             Alert.alert(
-              'ライセンス',
-              'Real-ESRGAN © Xintao Wang\nBSD 3-Clause License\n\n本アプリはReal-ESRGANを使用した超解像処理を行っています。',
+              t('settings.licensesTitle'),
+              t('settings.licensesBody'),
             )
           }
           isDark={isDark}
@@ -123,13 +117,13 @@ export default function SettingsScreen() {
 
       {/* About */}
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>アプリ情報</Text>
-        <SettingsRow icon="information-circle" label="バージョン" value="1.0.0" isDark={isDark} />
+        <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>{t('settings.about')}</Text>
+        <SettingsRow icon="information-circle" label={t('settings.version')} value="1.0.0" isDark={isDark} />
       </View>
 
       <View style={styles.footer}>
         <Text style={[styles.footerText, isDark && styles.textMuted]}>
-          UpScale AI - AI動画超解像
+          {t('settings.footer')}
         </Text>
         <Text style={[styles.footerCopy, isDark && styles.textMuted]}>
           Powered by Real-ESRGAN (BSD 3-Clause)
