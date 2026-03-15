@@ -1,4 +1,7 @@
-const { withXcodeProject } = require('expo/config-plugins');
+const {
+  withXcodeProject,
+  IOSConfig,
+} = require('expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 
@@ -19,6 +22,10 @@ function withCoreMLModels(config) {
     const iosProjectDir = path.join(platformProjectRoot, targetName);
 
     const target = project.getFirstTarget();
+    const targetUuid = target.uuid;
+
+    // Get the main group key for the project
+    const mainGroupId = project.getFirstProject().firstProject.mainGroup;
 
     for (const modelName of MODELS) {
       const srcPath = path.join(modelsSource, modelName);
@@ -26,24 +33,58 @@ function withCoreMLModels(config) {
 
       if (!fs.existsSync(srcPath)) continue;
 
-      // Copy mlpackage directory to iOS project
+      // Copy mlpackage directory into iOS project
       copyRecursiveSync(srcPath, destPath);
 
-      // Add as folder reference to Xcode project
-      // Use addFile with lastKnownFileType for mlpackage
-      const file = project.addFile(
-        modelName,
-        project.getFirstProject().uuid,
-        {
-          lastKnownFileType: 'folder',
-          sourceTree: '"<group>"',
-          path: modelName,
-        }
-      );
+      // Manually create PBXFileReference for the mlpackage folder
+      const fileRefUuid = project.generateUuid();
+      const buildFileUuid = project.generateUuid();
 
-      if (file) {
-        // Add to Resources build phase
-        project.addToPbxResourcesBuildPhase(file);
+      // Add PBXFileReference
+      if (!project.hash.project.objects['PBXFileReference']) {
+        project.hash.project.objects['PBXFileReference'] = {};
+      }
+      project.hash.project.objects['PBXFileReference'][fileRefUuid] = {
+        isa: 'PBXFileReference',
+        lastKnownFileType: 'folder',
+        name: modelName,
+        path: modelName,
+        sourceTree: '"<group>"',
+      };
+      project.hash.project.objects['PBXFileReference'][`${fileRefUuid}_comment`] = modelName;
+
+      // Add to main group's children
+      const mainGroup = project.hash.project.objects['PBXGroup'][mainGroupId];
+      if (mainGroup && mainGroup.children) {
+        mainGroup.children.push({
+          value: fileRefUuid,
+          comment: modelName,
+        });
+      }
+
+      // Add PBXBuildFile
+      if (!project.hash.project.objects['PBXBuildFile']) {
+        project.hash.project.objects['PBXBuildFile'] = {};
+      }
+      project.hash.project.objects['PBXBuildFile'][buildFileUuid] = {
+        isa: 'PBXBuildFile',
+        fileRef: fileRefUuid,
+        fileRef_comment: modelName,
+      };
+      project.hash.project.objects['PBXBuildFile'][`${buildFileUuid}_comment`] = `${modelName} in Resources`;
+
+      // Add to PBXResourcesBuildPhase
+      const resourcesBuildPhase = project.hash.project.objects['PBXResourcesBuildPhase'];
+      for (const key of Object.keys(resourcesBuildPhase)) {
+        if (key.endsWith('_comment')) continue;
+        const phase = resourcesBuildPhase[key];
+        if (phase && phase.files) {
+          phase.files.push({
+            value: buildFileUuid,
+            comment: `${modelName} in Resources`,
+          });
+          break;
+        }
       }
     }
 
