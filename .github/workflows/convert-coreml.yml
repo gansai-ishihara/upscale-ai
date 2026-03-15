@@ -176,7 +176,6 @@ jobs:
 
           model = ct.converters.convert(
               onnx_path,
-              source="onnx",
               inputs=[
                   ct.TensorType(
                       name="input",
