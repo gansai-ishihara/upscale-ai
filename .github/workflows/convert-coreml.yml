@@ -174,9 +174,8 @@ jobs:
           # CoreML変換
           compute_precision = ct.precision.FLOAT16 if precision == "float16" else ct.precision.FLOAT32
 
-          model = ct.converters.convert(
+          model = ct.convert(
               onnx_path,
-              source="onnx",
               inputs=[
                   ct.TensorType(
                       name="input",
