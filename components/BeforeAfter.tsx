@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { StyleSheet, View, Text, PanResponder, Image } from 'react-native';
+import { useState, useCallback } from 'react';
+import { StyleSheet, View, Text, PanResponder, TouchableOpacity } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { Ionicons } from '@expo/vector-icons';
 
 interface BeforeAfterProps {
   beforeUri: string;
@@ -9,6 +11,30 @@ interface BeforeAfterProps {
 export function BeforeAfter({ beforeUri, afterUri }: BeforeAfterProps) {
   const [sliderPosition, setSliderPosition] = useState(0.5);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const beforePlayer = useVideoPlayer(beforeUri, (player) => {
+    player.loop = true;
+    player.play();
+    player.muted = true;
+  });
+
+  const afterPlayer = useVideoPlayer(afterUri, (player) => {
+    player.loop = true;
+    player.play();
+    player.muted = true;
+  });
+
+  const togglePlayback = useCallback(() => {
+    if (isPlaying) {
+      beforePlayer.pause();
+      afterPlayer.pause();
+    } else {
+      beforePlayer.play();
+      afterPlayer.play();
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying, beforePlayer, afterPlayer]);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -28,14 +54,20 @@ export function BeforeAfter({ beforeUri, afterUri }: BeforeAfterProps) {
       {...panResponder.panHandlers}
     >
       {/* After (full background) */}
-      <Image source={{ uri: afterUri }} style={styles.image} resizeMode="cover" />
+      <VideoView
+        player={afterPlayer}
+        style={styles.video}
+        nativeControls={false}
+        contentFit="cover"
+      />
 
       {/* Before (clipped by slider) */}
       <View style={[styles.beforeClip, { width: `${sliderPosition * 100}%` }]}>
-        <Image
-          source={{ uri: beforeUri }}
-          style={[styles.image, { width: containerWidth || '100%' }]}
-          resizeMode="cover"
+        <VideoView
+          player={beforePlayer}
+          style={[styles.video, { width: containerWidth || 300 }]}
+          nativeControls={false}
+          contentFit="cover"
         />
       </View>
 
@@ -53,6 +85,11 @@ export function BeforeAfter({ beforeUri, afterUri }: BeforeAfterProps) {
       <View style={styles.labelAfter}>
         <Text style={styles.labelText}>After</Text>
       </View>
+
+      {/* Play/Pause button */}
+      <TouchableOpacity style={styles.playPauseBtn} onPress={togglePlayback}>
+        <Ionicons name={isPlaying ? 'pause' : 'play'} size={20} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -64,7 +101,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#111',
   },
-  image: {
+  video: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -134,5 +171,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 11,
     fontWeight: '600',
+  },
+  playPauseBtn: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

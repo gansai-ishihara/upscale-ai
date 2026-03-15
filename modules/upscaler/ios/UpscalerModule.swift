@@ -145,7 +145,7 @@ class UpscalerModule: NSObject {
     private func loadModel(scale: Int) throws {
         if model != nil { return }
 
-        let modelName = scale == 2 ? "RealESRGAN_x2" : "RealESRGAN_x4"
+        let modelName = scale == 2 ? "RealESRGAN_x2plus" : "RealESRGAN_x4plus"
         guard let modelURL = Bundle.main.url(forResource: modelName, withExtension: "mlmodelc")
                 ?? Bundle.main.url(forResource: modelName, withExtension: "mlpackage") else {
             throw NSError(domain: "UpscalerModule", code: -1,

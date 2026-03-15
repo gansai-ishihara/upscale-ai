@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export interface UpscaleOptions {
-  outputHeight: 720 | 1080 | 2160;
+  outputHeight: 720 | 1080 | 1440 | 2160;
   denoise: boolean;
   sharpen: boolean;
   colorEnhance: boolean;
@@ -19,7 +19,7 @@ export interface HistoryItem {
   inputUri: string;
   outputUri: string;
   thumbnailUri: string;
-  outputHeight: 720 | 1080 | 2160;
+  outputHeight: 720 | 1080 | 1440 | 2160;
   inputResolution: string;
   outputResolution: string;
   processingTime: number; // seconds

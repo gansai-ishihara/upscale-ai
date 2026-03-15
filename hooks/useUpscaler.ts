@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import { useAppStore, UpscaleOptions } from '@/stores/appStore';
 
 // Native Module bridge - will be available after EAS Build
@@ -79,8 +79,8 @@ export function useUpscaler() {
     resetProcessing();
 
     // Get actual file size
-    const fileInfo = await FileSystem.getInfoAsync(outputPath, { size: true });
-    const fileSize = fileInfo.exists && 'size' in fileInfo ? (fileInfo.size ?? 0) : 0;
+    const outputFile = new File(outputPath);
+    const fileSize = outputFile.exists ? outputFile.size ?? 0 : 0;
 
     // Add to history
     addHistoryItem({

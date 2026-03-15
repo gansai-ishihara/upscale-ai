@@ -3,7 +3,7 @@ import { NativeModules, NativeEventEmitter } from 'react-native';
 const { UpscalerModule } = NativeModules;
 
 export interface UpscaleOptions {
-  outputHeight: 720 | 1080 | 2160;
+  outputHeight: 720 | 1080 | 1440 | 2160;
   denoise: boolean;
   sharpen: boolean;
   colorEnhance: boolean;
