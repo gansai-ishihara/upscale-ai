@@ -41,7 +41,8 @@
           "androidAppId": "ca-app-pub-9059282179467665~0000000000"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "./plugins/withCoreMLModels"
     ],
     "experiments": {
       "typedRoutes": true
