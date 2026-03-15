@@ -11,7 +11,9 @@ interface PaywallModalProps {
 
 export function PaywallModal({ visible, onClose }: PaywallModalProps) {
   const { purchase } = useSubscription();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const termsUrl = locale === 'ja' ? LEGAL_URLS.TERMS_JA : LEGAL_URLS.TERMS_EN;
+  const privacyUrl = locale === 'ja' ? LEGAL_URLS.PRIVACY_JA : LEGAL_URLS.PRIVACY_EN;
 
   const FEATURES = [
     { icon: 'infinite' as const, text: t('paywall.featureUnlimited') },
@@ -49,11 +51,11 @@ export function PaywallModal({ visible, onClose }: PaywallModalProps) {
         </TouchableOpacity>
 
         <View style={styles.legalLinks}>
-          <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}>
+          <TouchableOpacity onPress={() => Linking.openURL(termsUrl)}>
             <Text style={styles.legalLink}>{t('paywall.terms')}</Text>
           </TouchableOpacity>
           <Text style={styles.legalSeparator}>|</Text>
-          <TouchableOpacity onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}>
+          <TouchableOpacity onPress={() => Linking.openURL(privacyUrl)}>
             <Text style={styles.legalLink}>{t('paywall.privacy')}</Text>
           </TouchableOpacity>
         </View>

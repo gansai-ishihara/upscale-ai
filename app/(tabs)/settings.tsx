@@ -49,7 +49,9 @@ export default function SettingsScreen() {
   const { isPro } = useAppStore();
   const { restore } = useSubscription();
   const [paywallVisible, setPaywallVisible] = useState(false);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const termsUrl = locale === 'ja' ? LEGAL_URLS.TERMS_JA : LEGAL_URLS.TERMS_EN;
+  const privacyUrl = locale === 'ja' ? LEGAL_URLS.PRIVACY_JA : LEGAL_URLS.PRIVACY_EN;
 
   const handleRestore = async () => {
     try {
@@ -92,13 +94,13 @@ export default function SettingsScreen() {
         <SettingsRow
           icon="document-text"
           label={t('settings.terms')}
-          onPress={() => Linking.openURL(LEGAL_URLS.TERMS)}
+          onPress={() => Linking.openURL(termsUrl)}
           isDark={isDark}
         />
         <SettingsRow
           icon="shield-checkmark"
           label={t('settings.privacy')}
-          onPress={() => Linking.openURL(LEGAL_URLS.PRIVACY)}
+          onPress={() => Linking.openURL(privacyUrl)}
           isDark={isDark}
         />
         <SettingsRow

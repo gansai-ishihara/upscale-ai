@@ -14,8 +14,10 @@ export const IAP = {
 } as const;
 
 export const LEGAL_URLS = {
-  PRIVACY: 'https://gansai-ishihara.github.io/upscale-ai/privacy',
-  TERMS: 'https://gansai-ishihara.github.io/upscale-ai/terms',
+  PRIVACY_JA: 'https://gansai-ishihara.github.io/upscale-ai/privacy',
+  PRIVACY_EN: 'https://gansai-ishihara.github.io/upscale-ai/privacy-en',
+  TERMS_JA: 'https://gansai-ishihara.github.io/upscale-ai/terms',
+  TERMS_EN: 'https://gansai-ishihara.github.io/upscale-ai/terms-en',
 } as const;
 
 export const OUTPUT_RESOLUTIONS = [
