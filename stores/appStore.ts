@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export interface UpscaleOptions {
-  scale: 2 | 4;
+  outputHeight: 720 | 1080 | 2160;
   denoise: boolean;
   sharpen: boolean;
   colorEnhance: boolean;
@@ -19,7 +19,7 @@ export interface HistoryItem {
   inputUri: string;
   outputUri: string;
   thumbnailUri: string;
-  scale: 2 | 4;
+  outputHeight: 720 | 1080 | 2160;
   inputResolution: string;
   outputResolution: string;
   processingTime: number; // seconds
@@ -48,10 +48,18 @@ interface AppState {
   // Selected video
   selectedVideoUri: string | null;
   setSelectedVideoUri: (uri: string | null) => void;
+  inputWidth: number;
+  inputHeight: number;
+  setInputResolution: (width: number, height: number) => void;
 
   // Output
   outputVideoUri: string | null;
   setOutputVideoUri: (uri: string | null) => void;
+
+  // Daily limit
+  dailyCount: number;
+  dailyDate: string;
+  setDailyCount: (count: number, date: string) => void;
 
   // History
   history: HistoryItem[];
@@ -67,7 +75,7 @@ const initialProcessing: ProcessingState = {
 };
 
 const initialOptions: UpscaleOptions = {
-  scale: 2,
+  outputHeight: 1080,
   denoise: false,
   sharpen: false,
   colorEnhance: false,
@@ -91,9 +99,16 @@ export const useAppStore = create<AppState>((set) => ({
 
   selectedVideoUri: null,
   setSelectedVideoUri: (uri) => set({ selectedVideoUri: uri }),
+  inputWidth: 0,
+  inputHeight: 0,
+  setInputResolution: (width, height) => set({ inputWidth: width, inputHeight: height }),
 
   outputVideoUri: null,
   setOutputVideoUri: (uri) => set({ outputVideoUri: uri }),
+
+  dailyCount: 0,
+  dailyDate: '',
+  setDailyCount: (count, date) => set({ dailyCount: count, dailyDate: date }),
 
   history: [],
   addHistoryItem: (item) =>

@@ -43,7 +43,7 @@ export default function HistoryScreen() {
           {item.inputResolution} → {item.outputResolution}
         </Text>
         <Text style={[styles.cardMeta, isDark && styles.textMuted]}>
-          x{item.scale} · {formatDuration(item.processingTime)} · {formatFileSize(item.fileSize)}
+          {formatDuration(item.processingTime)} · {formatFileSize(item.fileSize)}
         </Text>
         <Text style={[styles.cardDate, isDark && styles.textMuted]}>
           {formatDate(item.createdAt)}

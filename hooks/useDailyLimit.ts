@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppStore } from '@/stores/appStore';
 import { APP_CONFIG } from '@/constants/config';
@@ -11,8 +11,7 @@ function getTodayKey(): string {
 }
 
 export function useDailyLimit() {
-  const { isPro } = useAppStore();
-  const [count, setCount] = useState(0);
+  const { isPro, dailyCount, dailyDate, setDailyCount } = useAppStore();
   const limit = APP_CONFIG.FREE_DAILY_LIMIT;
 
   useEffect(() => {
@@ -21,30 +20,34 @@ export function useDailyLimit() {
 
   const loadCount = async () => {
     try {
+      const today = getTodayKey();
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (raw) {
         const data = JSON.parse(raw);
-        if (data.date === getTodayKey()) {
-          setCount(data.count);
+        if (data.date === today) {
+          setDailyCount(data.count, today);
         } else {
-          // New day, reset
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getTodayKey(), count: 0 }));
-          setCount(0);
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, count: 0 }));
+          setDailyCount(0, today);
         }
+      } else {
+        setDailyCount(0, today);
       }
     } catch {
-      setCount(0);
+      setDailyCount(0, getTodayKey());
     }
   };
 
   const incrementCount = useCallback(async () => {
-    const newCount = count + 1;
-    setCount(newCount);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getTodayKey(), count: newCount }));
-  }, [count]);
+    const today = getTodayKey();
+    const currentCount = useAppStore.getState().dailyCount;
+    const newCount = currentCount + 1;
+    setDailyCount(newCount, today);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, count: newCount }));
+  }, [setDailyCount]);
 
-  const remaining = Math.max(0, limit - count);
+  const remaining = Math.max(0, limit - dailyCount);
   const canProcess = isPro || remaining > 0;
 
-  return { count, remaining, limit, canProcess, incrementCount };
+  return { count: dailyCount, remaining, limit, canProcess, incrementCount };
 }

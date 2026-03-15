@@ -46,13 +46,28 @@ export function useUpscaler() {
 
       setProcessing({ isProcessing: false });
       setOutputVideoUri(videoUri); // In dev, just use input
+
+      // Add to history in dev mode too
+      addHistoryItem({
+        id: Date.now().toString(),
+        inputUri: videoUri,
+        outputUri: videoUri,
+        thumbnailUri: videoUri,
+        outputHeight: options.outputHeight,
+        inputResolution: 'dev',
+        outputResolution: `${options.outputHeight}p`,
+        processingTime: 2,
+        fileSize: 0,
+        createdAt: new Date().toISOString(),
+      });
+
       return videoUri;
     }
 
     setProcessing({ isProcessing: true, currentFrame: 0, totalFrames: 0 });
 
     const startTime = Date.now();
-    const outputPath: string = await UpscalerNative.upscaleVideo(videoUri, options.scale, {
+    const outputPath: string = await UpscalerNative.upscaleVideo(videoUri, options.outputHeight, {
       denoise: options.denoise,
       sharpen: options.sharpen,
       colorEnhance: options.colorEnhance,
@@ -73,9 +88,9 @@ export function useUpscaler() {
       inputUri: videoUri,
       outputUri: outputPath,
       thumbnailUri: outputPath,
-      scale: options.scale,
+      outputHeight: options.outputHeight,
       inputResolution: '720p',
-      outputResolution: options.scale === 2 ? '1080p' : '2160p',
+      outputResolution: `${options.outputHeight}p`,
       processingTime,
       fileSize,
       createdAt: new Date().toISOString(),

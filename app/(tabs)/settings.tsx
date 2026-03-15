@@ -74,7 +74,6 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="rocket"
             label={t('settings.upgradePro')}
-            value={t('settings.upgradePrice')}
             onPress={() => setPaywallVisible(true)}
             isDark={isDark}
           />

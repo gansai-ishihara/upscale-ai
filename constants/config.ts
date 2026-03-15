@@ -11,7 +11,6 @@ export const APP_CONFIG = {
 
 export const IAP = {
   PRODUCT_ID: 'upscale_ai_pro', // App Store Connectで設定する非消耗型プロダクトID
-  PRICE: '¥480',
 } as const;
 
 export const LEGAL_URLS = {
@@ -19,7 +18,10 @@ export const LEGAL_URLS = {
   TERMS: 'https://gansai-ishihara.github.io/upscale-ai/terms',
 } as const;
 
-export const UPSCALE_OPTIONS = {
-  scales: [2, 4] as const,
-  defaultScale: 2 as const,
-};
+export const OUTPUT_RESOLUTIONS = [
+  { label: '720p', height: 720 },
+  { label: '1080p', height: 1080 },
+  { label: '4K', height: 2160 },
+] as const;
+
+export type OutputResolutionHeight = typeof OUTPUT_RESOLUTIONS[number]['height'];

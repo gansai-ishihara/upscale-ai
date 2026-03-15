@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "upscaleai",
+    "platforms": ["ios"],
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash-icon.png",
@@ -36,7 +37,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "iosAppId": "ca-app-pub-9059282179467665~2457250987"
+          "iosAppId": "ca-app-pub-9059282179467665~2457250987",
+          "androidAppId": "ca-app-pub-9059282179467665~0000000000"
         }
       ],
       "expo-localization"

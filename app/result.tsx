@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as MediaLibrary from 'expo-media-library';
 import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAppStore } from '@/stores/appStore';
@@ -22,7 +23,11 @@ export default function ResultScreen() {
       Alert.alert(t('result.saveError'), t('result.savePermission'));
       return;
     }
-    await MediaLibrary.saveToLibraryAsync(outputVideoUri);
+    // Copy to a new temp file so it gets a fresh timestamp
+    const ext = outputVideoUri.split('.').pop() || 'mp4';
+    const freshPath = `${FileSystem.cacheDirectory}upscale_${Date.now()}.${ext}`;
+    await FileSystem.copyAsync({ from: outputVideoUri, to: freshPath });
+    await MediaLibrary.createAssetAsync(freshPath);
     Alert.alert(t('result.saveSuccess'), t('result.saveSuccessMsg'));
   };
 

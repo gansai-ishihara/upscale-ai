@@ -8,12 +8,13 @@ import { useDailyLimit } from '@/hooks/useDailyLimit';
 import { ProgressBar } from '@/components/ProgressBar';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useTranslation } from '@/constants/i18n';
+import { OUTPUT_RESOLUTIONS } from '@/constants/config';
 
 export default function ProcessScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { selectedVideoUri, options, setOptions, processing, isPro } = useAppStore();
+  const { selectedVideoUri, options, setOptions, processing, isPro, inputWidth, inputHeight } = useAppStore();
   const { startUpscale, cancelUpscale } = useUpscaler();
   const { remaining, canProcess, incrementCount } = useDailyLimit();
   const { showIfReady } = useInterstitialAd();
@@ -50,40 +51,47 @@ export default function ProcessScreen() {
         <Text style={[styles.videoLabel, isDark && styles.textLight]}>
           {t('process.videoSelected')}
         </Text>
+        {inputHeight > 0 && (
+          <Text style={[styles.resolutionText, isDark && styles.textMuted]}>
+            {inputWidth} × {inputHeight} ({inputHeight}p)
+          </Text>
+        )}
       </View>
 
       {/* Options */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, isDark && styles.textMuted]}>{t('process.settings')}</Text>
 
-        {/* Scale selector */}
+        {/* Resolution selector */}
         <View style={[styles.card, isDark && styles.cardDark]}>
           <Text style={[styles.optionLabel, isDark && styles.textLight]}>
             {t('process.scaleFactor')}
           </Text>
           <View style={styles.scaleButtons}>
-            <TouchableOpacity
-              style={[styles.scaleBtn, options.scale === 2 && styles.scaleBtnActive]}
-              onPress={() => setOptions({ scale: 2 })}
-            >
-              <Text style={[styles.scaleBtnText, options.scale === 2 && styles.scaleBtnTextActive]}>
-                x2
-              </Text>
-              <Text style={[styles.scaleDesc, options.scale === 2 && styles.scaleBtnTextActive]}>
-                720p → 1080p
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.scaleBtn, options.scale === 4 && styles.scaleBtnActive]}
-              onPress={() => setOptions({ scale: 4 })}
-            >
-              <Text style={[styles.scaleBtnText, options.scale === 4 && styles.scaleBtnTextActive]}>
-                x4
-              </Text>
-              <Text style={[styles.scaleDesc, options.scale === 4 && styles.scaleBtnTextActive]}>
-                480p → 1080p
-              </Text>
-            </TouchableOpacity>
+            {OUTPUT_RESOLUTIONS.map((res) => {
+              const isActive = options.outputHeight === res.height;
+              const isSameOrSmaller = inputHeight > 0 && res.height <= inputHeight;
+              return (
+                <TouchableOpacity
+                  key={res.height}
+                  style={[
+                    styles.scaleBtn,
+                    isActive && styles.scaleBtnActive,
+                    isSameOrSmaller && styles.scaleBtnDisabled,
+                  ]}
+                  onPress={() => !isSameOrSmaller && setOptions({ outputHeight: res.height })}
+                  disabled={isSameOrSmaller}
+                >
+                  <Text style={[
+                    styles.scaleBtnText,
+                    isActive && styles.scaleBtnTextActive,
+                    isSameOrSmaller && styles.scaleBtnTextDisabled,
+                  ]}>
+                    {res.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -182,6 +190,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   videoLabel: { fontSize: 14, fontWeight: '600', color: '#333' },
+  resolutionText: { fontSize: 13, color: '#6C5CE7', fontWeight: '600', marginTop: 2 },
   section: { paddingHorizontal: 16 },
   sectionTitle: {
     fontSize: 13,
@@ -210,9 +219,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scaleBtnActive: { backgroundColor: '#6C5CE7', borderColor: '#6C5CE7' },
-  scaleBtnText: { fontSize: 24, fontWeight: '800', color: '#6C5CE7' },
+  scaleBtnDisabled: { borderColor: '#ddd', opacity: 0.4 },
+  scaleBtnText: { fontSize: 20, fontWeight: '800', color: '#6C5CE7' },
   scaleBtnTextActive: { color: '#fff' },
-  scaleDesc: { fontSize: 11, color: '#999', marginTop: 4 },
+  scaleBtnTextDisabled: { color: '#ccc' },
   toggleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

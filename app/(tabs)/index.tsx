@@ -11,7 +11,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const { setSelectedVideoUri, history, isPro } = useAppStore();
+  const { setSelectedVideoUri, setInputResolution, history, isPro } = useAppStore();
   const { remaining, limit } = useDailyLimit();
   const { t } = useTranslation();
 
@@ -28,7 +28,9 @@ export default function HomeScreen() {
     });
 
     if (!result.canceled && result.assets[0]) {
-      setSelectedVideoUri(result.assets[0].uri);
+      const asset = result.assets[0];
+      setSelectedVideoUri(asset.uri);
+      setInputResolution(asset.width ?? 0, asset.height ?? 0);
       router.push('/process');
     }
   };
@@ -83,7 +85,7 @@ export default function HomeScreen() {
                   style={styles.historyThumb}
                 />
                 <Text style={[styles.historyLabel, isDark && styles.textMuted]} numberOfLines={1}>
-                  {item.outputResolution} · x{item.scale}
+                  {item.outputResolution}
                 </Text>
               </View>
             )}

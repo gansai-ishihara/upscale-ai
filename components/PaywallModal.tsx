@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text, TouchableOpacity, Modal, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSubscription } from '@/hooks/useSubscription';
-import { LEGAL_URLS, IAP } from '@/constants/config';
+import { LEGAL_URLS } from '@/constants/config';
 import { useTranslation } from '@/constants/i18n';
 
 interface PaywallModalProps {
@@ -45,7 +45,6 @@ export function PaywallModal({ visible, onClose }: PaywallModalProps) {
 
         {/* Purchase button */}
         <TouchableOpacity style={styles.purchaseBtn} onPress={purchase}>
-          <Text style={styles.purchasePrice}>{IAP.PRICE}</Text>
           <Text style={styles.purchaseLabel}>{t('paywall.purchaseLabel')}</Text>
         </TouchableOpacity>
 
@@ -87,8 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 40,
   },
-  purchasePrice: { fontSize: 32, fontWeight: '800', color: '#fff' },
-  purchaseLabel: { fontSize: 14, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
+  purchaseLabel: { fontSize: 18, fontWeight: '700', color: '#fff' },
   legalLinks: {
     flexDirection: 'row',
     justifyContent: 'center',

@@ -3,7 +3,7 @@ import { NativeModules, NativeEventEmitter } from 'react-native';
 const { UpscalerModule } = NativeModules;
 
 export interface UpscaleOptions {
-  scale: 2 | 4;
+  outputHeight: 720 | 1080 | 2160;
   denoise: boolean;
   sharpen: boolean;
   colorEnhance: boolean;
@@ -43,7 +43,7 @@ export async function upscaleVideo(
   if (!UpscalerModule) {
     throw new Error('UpscalerModule is not available. Use EAS Build for native modules.');
   }
-  return UpscalerModule.upscaleVideo(videoUri, options.scale, {
+  return UpscalerModule.upscaleVideo(videoUri, options.outputHeight, {
     denoise: options.denoise,
     sharpen: options.sharpen,
     colorEnhance: options.colorEnhance,
