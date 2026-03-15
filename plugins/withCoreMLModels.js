@@ -13,32 +13,37 @@ function withCoreMLModels(config) {
     const project = config.modResults;
     const projectRoot = config.modRequest.projectRoot;
     const platformProjectRoot = config.modRequest.platformProjectRoot;
-
-    // Xcode target name
     const targetName = config.modRequest.projectName;
-    const groupName = targetName;
 
-    // Source and destination paths
     const modelsSource = path.join(projectRoot, 'assets', 'models');
     const iosProjectDir = path.join(platformProjectRoot, targetName);
+
+    const target = project.getFirstTarget();
 
     for (const modelName of MODELS) {
       const srcPath = path.join(modelsSource, modelName);
       const destPath = path.join(iosProjectDir, modelName);
 
-      // Copy mlpackage to iOS project directory
-      if (fs.existsSync(srcPath)) {
-        copyRecursiveSync(srcPath, destPath);
+      if (!fs.existsSync(srcPath)) continue;
 
-        // Add to Xcode project as resource
-        const group = project.pbxGroupByName(groupName);
-        if (group) {
-          project.addResourceFile(
-            modelName,
-            { target: project.getFirstTarget().uuid },
-            group.uuid
-          );
+      // Copy mlpackage directory to iOS project
+      copyRecursiveSync(srcPath, destPath);
+
+      // Add as folder reference to Xcode project
+      // Use addFile with lastKnownFileType for mlpackage
+      const file = project.addFile(
+        modelName,
+        project.getFirstProject().uuid,
+        {
+          lastKnownFileType: 'folder',
+          sourceTree: '"<group>"',
+          path: modelName,
         }
+      );
+
+      if (file) {
+        // Add to Resources build phase
+        project.addToPbxResourcesBuildPhase(file);
       }
     }
 
