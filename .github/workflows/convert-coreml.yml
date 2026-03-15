@@ -50,7 +50,7 @@ jobs:
           pip install --upgrade pip
           pip install numpy==1.26.4 torch==2.1.2 torchvision==0.16.2
           pip install basicsr==1.4.2 realesrgan gfpgan
-          pip install coremltools==8.1 onnx==1.16.0 onnxruntime==1.19.0
+          pip install coremltools==7.2 onnx==1.16.0 onnxruntime==1.19.0
           pip install numpy==1.26.4 --force-reinstall --no-deps
 
       - name: Download Real-ESRGAN model & export ONNX
@@ -176,6 +176,7 @@ jobs:
 
           model = ct.converters.convert(
               onnx_path,
+              source="onnx",
               inputs=[
                   ct.TensorType(
                       name="input",
