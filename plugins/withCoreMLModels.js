@@ -48,7 +48,7 @@ function withCoreMLModels(config) {
         isa: 'PBXFileReference',
         lastKnownFileType: 'folder',
         name: modelName,
-        path: modelName,
+        path: `${targetName}/${modelName}`,
         sourceTree: '"<group>"',
       };
       project.hash.project.objects['PBXFileReference'][`${fileRefUuid}_comment`] = modelName;
