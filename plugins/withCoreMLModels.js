@@ -5,6 +5,7 @@ const fs = require('fs');
 const MODELS = [
   'RealESRGAN_x2plus.mlpackage',
   'RealESRGAN_x4plus.mlpackage',
+  'RealESRGAN_x4plus_anime.mlpackage',
 ];
 
 function withCoreMLModels(config) {

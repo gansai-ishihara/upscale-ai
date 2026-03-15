@@ -22,6 +22,13 @@ gh run download --repo "$REPO" \
   --dir /tmp/models-dl
 unzip -o /tmp/models-dl/RealESRGAN_x4plus_coreml.zip -d "$DEST"
 
+# x4plus_anime
+echo "  -> RealESRGAN_x4plus_anime..."
+gh run download --repo "$REPO" \
+  --name "RealESRGAN-x4plus_anime-coreml-tile256-float16" \
+  --dir /tmp/models-dl
+unzip -o /tmp/models-dl/RealESRGAN_x4plus_anime_coreml.zip -d "$DEST"
+
 rm -rf /tmp/models-dl
 
 echo "Done! Models in $DEST:"

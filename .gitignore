@@ -36,8 +36,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# CoreML models (large binaries - downloaded from GitHub Artifacts)
-assets/models/*.mlpackage
+# CoreML model temp files
 models-tmp/
 
 # generated native folders
